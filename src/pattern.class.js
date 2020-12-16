@@ -37,6 +37,21 @@
     offsetY: 0,
 
     /**
+     * crossOrigin value (one of "", "anonymous", "use-credentials")
+     * @see https://developer.mozilla.org/en-US/docs/HTML/CORS_settings_attributes
+     * @type String
+     * @default
+     */
+    crossOrigin: '',
+
+    /**
+     * transform matrix to change the pattern, imported from svgs.
+     * @type Array
+     * @default
+     */
+    patternTransform: null,
+
+    /**
      * Constructor
      * @param {Object} [options] Options object
      * @param {Function} [callback] function to invoke after callback init.
@@ -51,19 +66,14 @@
         callback && callback(this);
         return;
       }
-      // function string
-      if (typeof fabric.util.getFunctionBody(options.source) !== 'undefined') {
-        this.source = new Function(fabric.util.getFunctionBody(options.source));
-        callback && callback(this);
-      }
       else {
         // img src string
         var _this = this;
         this.source = fabric.util.createImage();
-        fabric.util.loadImage(options.source, function(img) {
+        fabric.util.loadImage(options.source, function(img, isError) {
           _this.source = img;
-          callback && callback(_this);
-        });
+          callback && callback(_this, isError);
+        }, null, this.crossOrigin);
       }
     },
 
@@ -76,12 +86,8 @@
       var NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
           source, object;
 
-      // callback
-      if (typeof this.source === 'function') {
-        source = String(this.source);
-      }
       // <img> element
-      else if (typeof this.source.src === 'string') {
+      if (typeof this.source.src === 'string') {
         source = this.source.src;
       }
       // <canvas> element
@@ -93,8 +99,10 @@
         type: 'pattern',
         source: source,
         repeat: this.repeat,
+        crossOrigin: this.crossOrigin,
         offsetX: toFixed(this.offsetX, NUM_FRACTION_DIGITS),
         offsetY: toFixed(this.offsetY, NUM_FRACTION_DIGITS),
+        patternTransform: this.patternTransform ? this.patternTransform.concat() : null
       };
       fabric.util.populateWithProperties(this, object, propertiesToInclude);
 
@@ -116,9 +124,16 @@
           patternImgSrc = '';
       if (this.repeat === 'repeat-x' || this.repeat === 'no-repeat') {
         patternHeight = 1;
+        if (patternOffsetY) {
+          patternHeight += Math.abs(patternOffsetY);
+        }
       }
       if (this.repeat === 'repeat-y' || this.repeat === 'no-repeat') {
         patternWidth = 1;
+        if (patternOffsetX) {
+          patternWidth += Math.abs(patternOffsetX);
+        }
+
       }
       if (patternSource.src) {
         patternImgSrc = patternSource.src;
@@ -153,8 +168,7 @@
      * @return {CanvasPattern}
      */
     toLive: function(ctx) {
-      var source = typeof this.source === 'function' ? this.source() : this.source;
-
+      var source = this.source;
       // if the image failed to load, return, and allow rest to continue loading
       if (!source) {
         return '';

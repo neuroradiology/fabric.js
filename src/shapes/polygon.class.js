@@ -2,8 +2,7 @@
 
   'use strict';
 
-  var fabric = global.fabric || (global.fabric = { }),
-      extend = fabric.util.object.extend;
+  var fabric = global.fabric || (global.fabric = { });
 
   if (fabric.Polygon) {
     fabric.warn('fabric.Polygon is already defined');
@@ -28,15 +27,13 @@
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
-     * @param {Boolean} noTransform
      */
-    _render: function(ctx, noTransform) {
-      if (!this.commonRender(ctx, noTransform)) {
+    _render: function(ctx) {
+      if (!this.commonRender(ctx)) {
         return;
       }
       ctx.closePath();
-      this._renderFill(ctx);
-      this._renderStroke(ctx);
+      this._renderPaintInOrder(ctx);
     },
 
     /**
@@ -63,21 +60,10 @@
    * @static
    * @memberOf fabric.Polygon
    * @param {SVGElement} element Element to parse
+   * @param {Function} callback callback function invoked after parsing
    * @param {Object} [options] Options object
-   * @return {fabric.Polygon} Instance of fabric.Polygon
    */
-  fabric.Polygon.fromElement = function(element, options) {
-    if (!element) {
-      return null;
-    }
-
-    options || (options = { });
-
-    var points = fabric.parsePointsAttribute(element.getAttribute('points')),
-        parsedAttributes = fabric.parseAttributes(element, fabric.Polygon.ATTRIBUTE_NAMES);
-
-    return new fabric.Polygon(points, extend(parsedAttributes, options));
-  };
+  fabric.Polygon.fromElement = fabric.Polyline.fromElementGenerator('Polygon');
   /* _FROM_SVG_END_ */
 
   /**
@@ -86,11 +72,9 @@
    * @memberOf fabric.Polygon
    * @param {Object} object Object to create an instance from
    * @param {Function} [callback] Callback to invoke when an fabric.Path instance is created
-   * @param {Boolean} [forceAsync] Force an async behaviour trying to create pattern first
-   * @return {fabric.Polygon} Instance of fabric.Polygon
    */
-  fabric.Polygon.fromObject = function(object, callback, forceAsync) {
-    return fabric.Object._fromObject('Polygon', object, callback, forceAsync, 'points');
+  fabric.Polygon.fromObject = function(object, callback) {
+    return fabric.Object._fromObject('Polygon', object, callback, 'points');
   };
 
 })(typeof exports !== 'undefined' ? exports : this);

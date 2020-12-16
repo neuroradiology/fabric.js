@@ -53,7 +53,6 @@
 
       t.action = 'scale';
       t.originX = t.originY = 'center';
-      this._setOriginToCenter(t.target);
 
       this._scaleObjectBy(self.scale, e);
 
@@ -62,9 +61,8 @@
         this._rotateObjectByAngle(self.rotation, e);
       }
 
-      this._setCenterToOrigin(t.target);
+      this.requestRenderAll();
 
-      this.renderAll();
       t.action = 'drag';
     },
 
@@ -123,25 +121,10 @@
      */
     _scaleObjectBy: function(s, e) {
       var t = this._currentTransform,
-          target = t.target,
-          lockScalingX = target.get('lockScalingX'),
-          lockScalingY = target.get('lockScalingY');
-
-      if (lockScalingX && lockScalingY) {
-        return;
-      }
-
+          target = t.target;
+      t.gestureScale = s;
       target._scaling = true;
-
-      var constraintPosition = target.translateToOriginPoint(target.getCenterPoint(), t.originX, t.originY),
-          dim = target._getTransformedDimensions();
-
-      this._setObjectScale(new fabric.Point(t.scaleX * dim.x * s / target.scaleX, t.scaleY * dim.y * s / target.scaleY),
-        t, lockScalingX, lockScalingY, null, target.get('lockScalingFlip'), dim);
-
-      target.setPositionByOrigin(constraintPosition, t.originX, t.originY);
-
-      this._fire('scaling', target, e);
+      return fabric.controlsUtils.scalingEqually(e, t, 0, 0);
     },
 
     /**
@@ -155,8 +138,12 @@
       if (t.target.get('lockRotation')) {
         return;
       }
-      t.target.angle = radiansToDegrees(degreesToRadians(curAngle) + t.theta);
-      this._fire('rotating', t.target, e);
+      t.target.rotate(radiansToDegrees(degreesToRadians(curAngle) + t.theta));
+      this._fire('rotating', {
+        target: t.target,
+        e: e,
+        transform: t,
+      });
     }
   });
 })();

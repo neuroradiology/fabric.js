@@ -1,14 +1,11 @@
-### Fabric
-
-<!-- chat, support -->
-
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/kangax/fabric.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+## Fabric.js
 
 <!-- build/coverage status, climate -->
 
-[![Build Status](https://secure.travis-ci.org/kangax/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
+[![Build Status](https://secure.travis-ci.org/fabricjs/fabric.js.svg?branch=master)](http://travis-ci.org/#!/kangax/fabric.js)
 [![Code Climate](https://d3s6mut3hikguw.cloudfront.net/github/kangax/fabric.js/badges/gpa.svg)](https://codeclimate.com/github/kangax/fabric.js)
-[![Coverage Status](https://coveralls.io/repos/kangax/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
+[![Coverage Status](https://coveralls.io/repos/fabricjs/fabric.js/badge.png?branch=master)](https://coveralls.io/r/kangax/fabric.js?branch=master)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/fabricjs/fabric.js) 
 
 <!-- npm, bower, CDNJS versions, downloads -->
 
@@ -25,7 +22,6 @@
 <!-- bounties, tips -->
 
 [![Bountysource](https://api.bountysource.com/badge/tracker?tracker_id=23217)](https://www.bountysource.com/trackers/23217-fabric-js?utm_source=23217&utm_medium=shield&utm_campaign=TRACKER_BADGE)
-[![Tips](https://img.shields.io/gratipay/kangax.svg)](https://gratipay.com/kangax/)
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=kangax&url=http://github.com/kangax/fabric.js&title=Fabric.js&language=&tags=github&category=software)
 
 **Fabric.js** is a framework that makes it easy to work with HTML5 canvas element. It is an **interactive object model** on top of canvas element. It is also an **SVG-to-canvas parser**.
@@ -43,14 +39,14 @@ Fabric.js allows you to easily create simple shapes like rectangles, circles, tr
 
 ### Goals
 
-- Unit tested (2400+ tests at the moment)
+- Unit tested (1150+ tests at the moment, 79%+ coverage)
 - Modular (~60 small ["classes", modules, mixins](http://fabricjs.com/docs/))
 - Cross-browser
 - [Fast](https://github.com/kangax/fabric.js/wiki/Focus-on-speed)
 - Encapsulated in one object
 - No browser sniffing for critical functionality
 - Runs under ES5 strict mode
-- Runs on a server under [Node.js](http://nodejs.org/) (stable releases and latest of current) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
+- Runs on a server under [Node.js](http://nodejs.org/) (active stable releases and latest of current) (see [Node.js limitations](https://github.com/kangax/fabric.js/wiki/Fabric-limitations-in-node.js))
 - Follows [Semantic Versioning](http://semver.org/)
 
 ### Supported browsers
@@ -67,14 +63,34 @@ You can [run automated unit tests](http://fabricjs.com/test/unit/) right in the 
 
 Fabric.js started as a foundation for design editor on [printio.ru](http://printio.ru) — interactive online store with ability to create your own designs. The idea was to create [Javascript-based editor](http://printio.ru/ringer_man_tees/new), which would make it easy to manipulate vector shapes and images on T-Shirts. Since performance was one of the most critical requirements, we chose canvas over SVG. While SVG is excellent with static shapes, it's not as performant as canvas when it comes to dynamic manipulation of objects (movement, scaling, rotation, etc.). Fabric.js was heavily inspired by [Ernest Delgado's canvas experiment](http://www.ernestdelgado.com/public-tests/canvasphoto/demo/canvas.html). In fact, code from Ernest's experiment was the foundation of an entire framework. Later, Fabric.js grew into a collection of distinct object types and got an SVG-to-canvas parser.
 
+### Installation Instructions
+
 <h3 id="bower-install">Install with bower</h3>
 
     $ bower install fabric
 
 <h3 id="npm-install">Install with npm</h3>
-To install Fabric.js using npm, you must first manually [install Cairo](http://cairographics.org/download/) on your system. Cairo is a system library which powers node-canvas, which Fabric.js relies on. When the installation is complete, you may need to restart your terminal or command prompt before installing fabric.
+
+Note: If you are using Fabric.js in a Node.js script, you will depend from [node-canvas](https://github.com/Automattic/node-canvas).`node-canvas` is an html canvas replacement that works on top of native libraries.
+Please follow the instructions located [here](https://github.com/Automattic/node-canvas#compiling) in order to get it up and running.
+
 
     $ npm install fabric --save
+    
+
+After this, you can import fabric like so:
+
+```
+const fabric = require("fabric").fabric;
+```
+
+Or you can use this instead if your environment supports ES6 imports:
+
+```
+import { fabric } from "fabric";
+```
+
+See [the example section](#examples-of-use) for usage examples.
 
 <h3 id="fabric-building">Building</h3>
 
@@ -129,13 +145,9 @@ To install Fabric.js using npm, you must first manually [install Cairo](http://c
 
         //# sourceMappingURL=fabric.min.js.map
 
-6. Lint source code (prerequisite: `npm -g install jshint`)
+6. Ensure code guidelines are met (prerequisite: `npm -g install eslint`)
 
-        $ jshint src
-
-7. Ensure code guidelines are met (prerequisite: `npm -g install jscs`)
-
-        $ jscs src
+        $ npm run lint && npm run lint_tests
 
 <h3 id="fabric-building">Testing</h3>
 
@@ -238,7 +250,7 @@ For example:
 
 ### Staying in touch
 
-Follow [@fabric.js](http://twitter.com/fabricjs), [@kangax](http://twitter.com/kangax) or or [@AndreaBogazzi](http://twitter.com/AndreaBogazzi) on twitter.
+Follow [@fabric.js](http://twitter.com/fabricjs), [@kangax](http://twitter.com/kangax) or [@AndreaBogazzi](http://twitter.com/AndreaBogazzi) on twitter.
 
 Questions, suggestions — [fabric.js on Google Groups](http://groups.google.com/group/fabricjs).
 
@@ -252,11 +264,12 @@ Get help in Fabric's IRC channel — irc://irc.freenode.net/#fabric.js
 
 ### Credits
 
+- [Andrea Bogazzi](https://twitter.com/AndreaBogazzi) for help with bugs, new features, documentation, GitHub issues
 - Ernest Delgado for the original idea of [manipulating images on canvas](http://www.ernestdelgado.com/archive/canvas/)
 - [Maxim "hakunin" Chernyak](http://twitter.com/hakunin) for ideas, and help with various parts of the library throughout its life
 - [Sergey Nisnevich](http://nisnya.com) for help with geometry logic
-- [Stefan Kienzle](https://twitter.com/kienzle_s) for help with bugs, features, documentation, github issues
-- [Andrea Bogazzi](https://twitter.com/AndreaBogazzi) for help with bugs, new features, documentation, github issues
+- [Stefan Kienzle](https://twitter.com/kienzle_s) for help with bugs, features, documentation, GitHub issues
+- [Shutterstock](http://www.shutterstock.com/jobs) for the time and resources invested in using and improving fabric.js
 - [And all the other GitHub contributors](https://github.com/kangax/fabric.js/graphs/contributors)
 
 ### MIT License
@@ -277,6 +290,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/kangax/fabric.js/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

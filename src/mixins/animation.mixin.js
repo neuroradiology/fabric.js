@@ -25,12 +25,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('left'),
+      startValue: object.left,
       endValue: this.getCenter().left,
       duration: this.FX_DURATION,
       onChange: function(value) {
         object.set('left', value);
-        _this.renderAll();
+        _this.requestRenderAll();
         onChange();
       },
       onComplete: function() {
@@ -60,12 +60,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('top'),
+      startValue: object.top,
       endValue: this.getCenter().top,
       duration: this.FX_DURATION,
       onChange: function(value) {
         object.set('top', value);
-        _this.renderAll();
+        _this.requestRenderAll();
         onChange();
       },
       onComplete: function() {
@@ -95,15 +95,12 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
         _this = this;
 
     fabric.util.animate({
-      startValue: object.get('opacity'),
+      startValue: object.opacity,
       endValue: 0,
       duration: this.FX_DURATION,
-      onStart: function() {
-        object.set('active', false);
-      },
       onChange: function(value) {
         object.set('opacity', value);
-        _this.renderAll();
+        _this.requestRenderAll();
         onChange();
       },
       onComplete: function () {
@@ -177,6 +174,10 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       propPair = property.split('.');
     }
 
+    var propIsColor =
+      _this.colorProperties.indexOf(property) > -1 ||
+      (propPair && _this.colorProperties.indexOf(propPair[1]) > -1);
+
     var currentValue = propPair
       ? this.get(propPair[0])[propPair[1]]
       : this.get(property);
@@ -185,23 +186,25 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       options.from = currentValue;
     }
 
-    if (~to.indexOf('=')) {
-      to = currentValue + parseFloat(to.replace('=', ''));
-    }
-    else {
-      to = parseFloat(to);
+    if (!propIsColor) {
+      if (~to.indexOf('=')) {
+        to = currentValue + parseFloat(to.replace('=', ''));
+      }
+      else {
+        to = parseFloat(to);
+      }
     }
 
-    fabric.util.animate({
+    var _options = {
       startValue: options.from,
       endValue: to,
       byValue: options.by,
       easing: options.easing,
       duration: options.duration,
-      abort: options.abort && function() {
+      abort: options.abort && function () {
         return options.abort.call(_this);
       },
-      onChange: function(value) {
+      onChange: function (value, valueProgress, timeProgress) {
         if (propPair) {
           _this[propPair[0]][propPair[1]] = value;
         }
@@ -211,16 +214,23 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         if (skipCallbacks) {
           return;
         }
-        options.onChange && options.onChange();
+        options.onChange && options.onChange(value, valueProgress, timeProgress);
       },
-      onComplete: function() {
+      onComplete: function (value, valueProgress, timeProgress) {
         if (skipCallbacks) {
           return;
         }
 
         _this.setCoords();
-        options.onComplete && options.onComplete();
+        options.onComplete && options.onComplete(value, valueProgress, timeProgress);
       }
-    });
+    };
+
+    if (propIsColor) {
+      fabric.util.animateColor(_options.startValue, _options.endValue, _options.duration, _options);
+    }
+    else {
+      fabric.util.animate(_options);
+    }
   }
 });
